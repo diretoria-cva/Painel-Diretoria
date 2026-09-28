@@ -1,6 +1,6 @@
 /* Service worker — deixa o app rápido e abrindo mesmo sem internet.
    Ao publicar uma nova versão, aumente o número abaixo. */
-const VERSAO = "cv-diretoria-v4";
+const VERSAO = "cv-diretoria-v5";
 const ARQUIVOS = ["./", "index.html", "style.css", "config.js", "demo.js", "app.js", "manifest.webmanifest",
   "logo.svg", "logo-branco.svg", "marca.svg", "icon-192.png", "apple-touch-icon.png",
   "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"];

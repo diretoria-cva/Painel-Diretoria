@@ -17,23 +17,24 @@ Siga **`apps-script/GUIA-INSTALACAO.txt`**, que tem o passo a passo completo:
 
 1. Criar o usuário *Diretoria* no Pedidos de Compra.
 2. Instalar o Apps Script na conta **diretcva@gmail.com** e colocar as senhas em *Propriedades do script*.
-3. Colar a URL do Apps Script em `js/config.js` (`hubUrl`) e publicar este repositório no GitHub Pages.
+3. Colar a URL do Apps Script em `config.js` (`hubUrl`) e publicar este repositório no GitHub Pages.
 4. No iPad: Safari › Compartilhar › Adicionar à Tela de Início.
 
 ## Estrutura
 
+Todos os arquivos do site ficam na raiz do repositório (sem pastas):
 ```
 index.html               página do app
-css/style.css            visual (cores oficiais no topo, em :root)
-js/config.js             ÚNICO arquivo de configuração do site
-js/app.js                indicadores, gráficos, alertas e login
-js/demo.js               dados fictícios do modo demonstração
-assets/                  logo oficial
-icons/                   ícones do app
+style.css                visual (cores oficiais no topo, em :root)
+config.js                ÚNICO arquivo de configuração do site
+app.js                   indicadores, gráficos, alertas e login
+demo.js                  dados fictícios do modo demonstração
+logo.svg, logo-branco.svg, marca.svg   logo oficial
+icon-*.png, apple-touch-icon.png       ícones do app
 manifest.webmanifest     configuração do "aplicativo"
 sw.js                    funcionamento offline
-apps-script/             backend (Google Apps Script) + guia de instalação
 ```
+A pasta `apps-script/` (backend e guia) não precisa ir para o GitHub.
 
 ## Segurança
 

@@ -34,7 +34,7 @@ a{color:var(--verde-600)}
 [hidden]{display:none!important}
 
 /* ===== Login ===== */
-.login{min-height:100%;display:grid;place-items:center;padding:24px;
+.login{position:fixed;inset:0;z-index:60;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:100%;display:grid;place-items:center;padding:24px;
   background:radial-gradient(1100px 600px at 5% -10%,rgba(0,147,52,.75) 0%,transparent 60%),
              radial-gradient(800px 500px at 110% 110%,rgba(92,195,0,.35) 0%,transparent 60%),var(--verde-900)}
 .login-card{width:min(390px,100%);background:var(--card);border-radius:24px;padding:40px 32px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.35)}
@@ -227,3 +227,50 @@ td small{display:block;color:var(--tinta-3);font-size:11.5px;margin-top:2px}
   .card{box-shadow:none;border:1px solid var(--linha);break-inside:avoid}
   .alertas{max-height:none}
 }
+
+/* ===== Login: manter conectado, ver senha ===== */
+.login-card{position:relative;overflow:hidden}
+.login-corpo{transition:opacity .35s ease,transform .35s ease}
+.senha-campo{position:relative}
+.senha-campo input{width:100%;padding-right:52px}
+.ver-senha{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:10px;color:var(--tinta-3);display:grid;place-items:center}
+.ver-senha:hover{color:var(--verde-600);background:var(--verde-50)}
+.ver-senha.on{color:var(--verde-600)}
+.manter{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--tinta-2);cursor:pointer;user-select:none;-webkit-user-select:none;text-align:left;padding:4px 2px 6px}
+.manter input{position:absolute;opacity:0;pointer-events:none}
+.manter .caixa{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--linha);background:#fff;flex:none;display:grid;place-items:center;transition:background .2s,border-color .2s}
+.manter .caixa::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px) scale(0);transition:transform .2s}
+.manter input:checked + .caixa{background:var(--verde-600);border-color:var(--verde-600)}
+.manter input:checked + .caixa::after{transform:rotate(45deg) translate(-1px,-1px) scale(1)}
+.manter input:focus-visible + .caixa{box-shadow:0 0 0 3px var(--verde-100)}
+
+/* ===== Login: animação de validação ===== */
+.validando{position:absolute;left:0;right:0;top:118px;bottom:0;display:grid;place-content:center;justify-items:center;gap:14px;opacity:0;visibility:hidden;transform:scale(.92);transition:opacity .4s ease,transform .4s ease,visibility 0s linear .4s}
+.validando p{font-size:14px;font-weight:600;color:var(--tinta-2);min-height:20px}
+.login-card.ativo .login-corpo{opacity:0;transform:scale(.96);pointer-events:none}
+.login-card.ativo .validando{opacity:1;visibility:visible;transform:none;transition:opacity .45s ease .12s,transform .45s ease .12s,visibility 0s}
+.anim{width:132px;height:132px;overflow:visible}
+.anim path,.anim circle{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.dig-base path{stroke:#DCE3DE;stroke-width:5}
+.dig-verde path{stroke:var(--verde-500);stroke-width:5;stroke-dasharray:100;stroke-dashoffset:100}
+.dig-base,.dig-verde{transform-origin:60px 60px;transition:transform .35s ease,opacity .3s ease}
+.login-card.ativo .dig-verde path{animation:varre 1.9s cubic-bezier(.45,.05,.35,1) infinite;animation-delay:calc(var(--i) * .09s)}
+@keyframes varre{0%{stroke-dashoffset:100;opacity:1}55%{stroke-dashoffset:0;opacity:1}82%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+.aro{stroke:var(--verde-500);stroke-width:6;stroke-dasharray:100;stroke-dashoffset:100;transform:rotate(-90deg);transform-origin:60px 60px}
+.disco{fill:var(--verde-600)!important;stroke:none;transform:scale(0);transform-origin:60px 60px;opacity:0}
+.check,.xis{stroke:#fff;stroke-width:8;stroke-dasharray:100;stroke-dashoffset:100}
+/* sucesso: digital some, aro desenha, disco enche, ✓ aparece */
+.validando.ok .dig-base,.validando.ok .dig-verde{transform:scale(.55);opacity:0}
+.validando.ok .aro{transition:stroke-dashoffset .38s ease;stroke-dashoffset:0}
+.validando.ok .disco{transition:transform .3s cubic-bezier(.3,1.4,.5,1) .32s,opacity .15s .32s;transform:scale(1);opacity:1}
+.validando.ok .check{transition:stroke-dashoffset .3s ease .58s;stroke-dashoffset:0}
+/* erro: aro e ✕ vermelhos */
+.validando.erro .dig-base,.validando.erro .dig-verde{transform:scale(.55);opacity:0}
+.validando.erro .aro{stroke:var(--vermelho);transition:stroke-dashoffset .35s ease;stroke-dashoffset:0}
+.validando.erro .disco{fill:var(--vermelho)!important;transition:transform .28s ease .3s,opacity .15s .3s;transform:scale(1);opacity:1}
+.validando.erro .xis{transition:stroke-dashoffset .3s ease .52s;stroke-dashoffset:0}
+.validando.erro .anim{animation:treme .4s ease .55s}
+@keyframes treme{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+/* saída para o painel */
+.login.saindo{transition:opacity .45s ease;opacity:0}
+@media (prefers-reduced-motion:reduce){.login-card.ativo .dig-verde path{animation-duration:3s}}
