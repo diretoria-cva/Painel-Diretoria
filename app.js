@@ -19,16 +19,21 @@
     { k: "naoExiste", txt: "Cliente não existe", cor: "#D64545" }
   ];
   const ABAS = { geral: "Visão geral", comercial: "Comercial", compras: "Compras", logistica: "Logística" };
-  const K_TOKEN = "cv_dir_token", K_CACHE = "cv_dir_cache", K_NOME = "cv_dir_nome", K_EMAIL = "cv_dir_email";
+  const K_TOKEN = "cv_dir_token", K_CACHE = "cv_dir_cache", K_NOME = "cv_dir_nome", K_EMAIL = "cv_dir_email", K_MANTER = "cv_dir_manter";
 
   const S = { dados: null, aba: "geral", periodo: "mes", charts: [], token: null, carregando: false, ultimaVez: 0 };
 
   /* ---------------- Utilidades ---------------- */
-  const store = {
-    get: k => { try { return localStorage.getItem(k); } catch { return null; } },
-    set: (k, v) => { try { localStorage.setItem(k, v); } catch {} },
-    del: k => { try { localStorage.removeItem(k); } catch {} }
-  };
+  const armaz = tipo => ({
+    get: k => { try { return window[tipo].getItem(k); } catch { return null; } },
+    set: (k, v) => { try { window[tipo].setItem(k, v); } catch {} },
+    del: k => { try { window[tipo].removeItem(k); } catch {} }
+  });
+  const store = armaz("localStorage"), sessao = armaz("sessionStorage");
+  // "Manter conectado": sessão salva no aparelho. Sem ela, some ao fechar o navegador.
+  const manter = () => store.get(K_MANTER) !== "0";
+  const guardarToken = t => { S.token = t; if (manter()) { store.set(K_TOKEN, t); sessao.del(K_TOKEN); } else { sessao.set(K_TOKEN, t); store.del(K_TOKEN); } };
+  const lerToken = () => store.get(K_TOKEN) || sessao.get(K_TOKEN);
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const pad = n => String(n).padStart(2, "0");
   const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -487,7 +492,13 @@
     if (S.carregando) return; S.carregando = true;
     if (!silencioso) $("#carregando").hidden = false;
     $("#btn-atualizar").classList.add("girando");
-    try { const j = await api("dados", { forcar }); aplicar(j.dados); }
+    try {
+      const j = await api("dados", { forcar, manter: manter(), inicio: !S.prefsLidas });
+      if (j.novoToken) guardarToken(j.novoToken);
+      if (j.nome) { store.set(K_NOME, j.nome); $("#usuario").textContent = j.nome; }
+      if (j.prefs && !S.prefsLidas) { S.prefsLidas = true; aplicarPrefs(j.prefs, false); }
+      aplicar(j.dados);
+    }
     catch (e) {
       if (e.sessao === false) return sair();
       const av = $("#aviso"); av.className = "aviso erro"; av.hidden = false;
@@ -495,34 +506,87 @@
     } finally { S.carregando = false; $("#carregando").hidden = true; $("#btn-atualizar").classList.remove("girando"); }
   }
 
+  /* ---------------- Preferências (salvas no servidor, valem em todos os aparelhos) ---------------- */
+  function aplicarPrefs(pr, redesenhar = true) {
+    if (!pr) return;
+    if (pr.periodo && [...$("#f-periodo").options].some(o => o.value === pr.periodo)) { S.periodo = pr.periodo; $("#f-periodo").value = pr.periodo; }
+    if (pr.aba && ABAS[pr.aba]) S.aba = pr.aba;
+    if (redesenhar) render();
+  }
+  let tPrefs;
+  function salvarPrefs() {
+    if (!CFG.hubUrl || !S.token) return;
+    clearTimeout(tPrefs);
+    tPrefs = setTimeout(() => api("prefs", { prefs: { periodo: S.periodo, aba: S.aba } }).catch(() => {}), 900);
+  }
+  function nomeDispositivo() {
+    const u = navigator.userAgent;
+    const ipad = /iPad/.test(u) || (/Macintosh/.test(u) && navigator.maxTouchPoints > 1);
+    const tipo = ipad ? "iPad" : /iPhone/.test(u) ? "iPhone" : /Android/.test(u) ? (/Mobile/.test(u) ? "Celular Android" : "Tablet Android") : /Windows/.test(u) ? "Computador Windows" : /Macintosh/.test(u) ? "Mac" : "Outro";
+    const nav = /Edg\//.test(u) ? "Edge" : /CriOS|Chrome\//.test(u) ? "Chrome" : /FxiOS|Firefox\//.test(u) ? "Firefox" : /Safari\//.test(u) ? "Safari" : "";
+    const app = window.matchMedia && matchMedia("(display-mode: standalone)").matches || navigator.standalone ? " (app)" : "";
+    return tipo + (nav ? " · " + nav : "") + app;
+  }
+
   /* ---------------- Acesso ---------------- */
-  function mostrarApp() { $("#login").hidden = true; $("#app").hidden = false; }
-  function sair() { store.del(K_TOKEN); store.del(K_CACHE); store.del(K_NOME); location.reload(); }
+  const esperar = ms => new Promise(r => setTimeout(r, Math.max(0, ms)));
+  function mostrarApp() { $("#app").hidden = false; $("#login").hidden = true; $("#login").classList.remove("saindo"); }
+  function sair() { store.del(K_TOKEN); sessao.del(K_TOKEN); store.del(K_CACHE); store.del(K_NOME); location.reload(); }
   function iniciar() {
     $("#versao").textContent = "v" + CFG.versao;
     if (!CFG.hubUrl) { $("#carregando").hidden = true; mostrarApp(); aplicar(window.CV_DEMO(), false); $("#btn-sair").hidden = true; return; }
-    S.token = store.get(K_TOKEN);
+    S.token = lerToken();
     $("#usuario").textContent = store.get(K_NOME) || "";
-    if (!S.token) { $("#carregando").hidden = true; $("#login").hidden = false; const em = store.get(K_EMAIL); if (em) { $("#email").value = em; $("#senha").focus(); } else $("#email").focus(); return; }
+    $("#manter").checked = manter();
+    if (!S.token) {
+      $("#carregando").hidden = true; $("#login").hidden = false;
+      const em = store.get(K_EMAIL); if (em) { $("#email").value = em; $("#senha").focus(); } else $("#email").focus();
+      return;
+    }
     mostrarApp();
     const cache = store.get(K_CACHE);
     if (cache) { try { aplicar(JSON.parse(cache), false); } catch {} }
     carregar({ silencioso: !!cache });
   }
+  $("#ver-senha").addEventListener("click", () => {
+    const i = $("#senha"), vis = i.type === "password"; i.type = vis ? "text" : "password";
+    $("#ver-senha").classList.toggle("on", vis); $("#ver-senha").setAttribute("aria-label", vis ? "Ocultar senha" : "Mostrar senha");
+  });
   $("#login-form").addEventListener("submit", async e => {
-    e.preventDefault(); $("#login-erro").textContent = ""; $("#btn-entrar").textContent = "Entrando…"; $("#btn-entrar").disabled = true;
+    e.preventDefault();
+    const card = $("#login-card"), val = $("#validando"), txt = $("#validando-txt");
+    if (card.classList.contains("ativo")) return;
+    $("#login-erro").textContent = ""; $("#senha").type = "password";
+    val.className = "validando"; txt.textContent = "Validando acesso…"; card.classList.add("ativo");
+    const t0 = Date.now(), email = $("#email").value.trim().toLowerCase(), mant = $("#manter").checked;
     try {
-      const email = $("#email").value.trim().toLowerCase();
-      const j = await api("login", { email, senha: $("#senha").value });
-      S.token = j.token; store.set(K_TOKEN, j.token); store.set(K_EMAIL, email); store.set(K_NOME, j.nome || "");
-      $("#usuario").textContent = j.nome || ""; mostrarApp(); aplicar(j.dados);
-    } catch (x) { $("#login-erro").textContent = x.message === "Failed to fetch" ? "Sem conexão com o Google. Tente de novo." : x.message; }
-    $("#btn-entrar").textContent = "Entrar"; $("#btn-entrar").disabled = false;
+      const j = await api("login", { email, senha: $("#senha").value, manter: mant, dispositivo: nomeDispositivo() });
+      await esperar(1700 - (Date.now() - t0));           // deixa a digital completar a leitura
+      val.classList.add("ok"); txt.textContent = "Bem-vindo" + (j.nome ? ", " + j.nome.split(" ")[0] : "") + "!";
+      store.set(K_MANTER, mant ? "1" : "0"); guardarToken(j.token);
+      store.set(K_EMAIL, email); store.set(K_NOME, j.nome || "");
+      $("#usuario").textContent = j.nome || "";
+      S.prefsLidas = true; aplicarPrefs(j.prefs, false);
+      await esperar(1150);
+      $("#app").hidden = false; aplicar(j.dados);           // o painel se monta por trás
+      $("#login").classList.add("saindo");
+      await esperar(450);
+      mostrarApp(); card.classList.remove("ativo"); val.className = "validando"; $("#senha").value = "";
+    } catch (x) {
+      await esperar(1100 - (Date.now() - t0));
+      val.classList.add("erro");
+      const msg = x.message === "Failed to fetch" ? "Sem conexão com o Google. Tente de novo." : x.message;
+      txt.textContent = msg;
+      await esperar(1700);
+      card.classList.remove("ativo");
+      await esperar(350);
+      val.className = "validando"; $("#login-erro").textContent = msg; $("#senha").select();
+    }
   });
 
   /* ---------------- Eventos ---------------- */
-  $("#nav").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.aba = b.dataset.aba; render(); window.scrollTo({ top: 0 }); });
-  $("#f-periodo").addEventListener("change", e => { S.periodo = e.target.value; render(); });
+  $("#nav").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.aba = b.dataset.aba; render(); window.scrollTo({ top: 0 }); salvarPrefs(); });
+  $("#f-periodo").addEventListener("change", e => { S.periodo = e.target.value; render(); salvarPrefs(); });
   $("#btn-atualizar").addEventListener("click", () => carregar({ forcar: true }));
   $("#btn-imprimir").addEventListener("click", () => window.print());
   $("#btn-sair").addEventListener("click", sair);
