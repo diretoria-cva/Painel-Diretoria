@@ -191,7 +191,7 @@ td small{display:block;color:var(--tinta-3);font-size:11.5px;margin-top:2px}
 @media (max-width:1180px){
   :root{--sidebar:92px}
   .brand{padding:0 0 24px;text-align:center}
-  .brand img{content:url("../assets/marca.svg");width:48px;height:48px}
+  .brand img{content:url("marca.svg");width:48px;height:48px}
   .nav button{flex-direction:column;justify-content:center;height:64px;padding:6px 4px;gap:4px;font-size:10.5px;text-align:center}
   .nav button.ativo{box-shadow:inset 0 -3px 0 var(--lima)}
   .badge{position:absolute;top:6px;right:10px;margin:0}

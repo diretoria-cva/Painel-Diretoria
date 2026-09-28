@@ -13,21 +13,21 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="CV Diretoria">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
   <link rel="manifest" href="manifest.webmanifest">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <!-- ===== Tela de acesso ===== -->
   <section id="login" class="login" hidden>
     <div class="login-card">
-      <img src="assets/logo.svg" alt="Cheiro Verde Ambiental" class="login-logo">
+      <img src="logo.svg" alt="Cheiro Verde Ambiental" class="login-logo">
       <h1>Painel da Diretoria</h1>
       <p>Entre com seu e-mail e senha</p>
       <form id="login-form">
@@ -42,7 +42,7 @@
   <!-- ===== Aplicativo ===== -->
   <div id="app" class="app" hidden>
     <aside class="sidebar">
-      <div class="brand"><img src="assets/logo-branco.svg" alt="Cheiro Verde Ambiental"></div>
+      <div class="brand"><img src="logo-branco.svg" alt="Cheiro Verde Ambiental"></div>
       <nav class="nav" id="nav">
         <button data-aba="geral" class="ativo"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3zm0 8h8v-6H3zm10 0h8V11h-8zm0-18v6h8V3z"/></svg><span>Visão geral</span></button>
         <button data-aba="comercial"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg><span>Comercial</span></button>
@@ -94,8 +94,8 @@
   <div id="carregando" class="carregando"><div class="spinner"></div><p>Buscando dados dos sistemas…</p></div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/demo.js"></script>
-  <script src="js/app.js"></script>
+  <script src="config.js"></script>
+  <script src="demo.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

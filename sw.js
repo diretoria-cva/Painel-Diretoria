@@ -1,8 +1,8 @@
 /* Service worker — deixa o app rápido e abrindo mesmo sem internet.
    Ao publicar uma nova versão, aumente o número abaixo. */
-const VERSAO = "cv-diretoria-v3";
-const ARQUIVOS = ["./", "index.html", "css/style.css", "js/config.js", "js/demo.js", "js/app.js", "manifest.webmanifest",
-  "assets/logo.svg", "assets/logo-branco.svg", "assets/marca.svg", "icons/icon-192.png", "icons/apple-touch-icon.png",
+const VERSAO = "cv-diretoria-v4";
+const ARQUIVOS = ["./", "index.html", "style.css", "config.js", "demo.js", "app.js", "manifest.webmanifest",
+  "logo.svg", "logo-branco.svg", "marca.svg", "icon-192.png", "apple-touch-icon.png",
   "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"];
 
 self.addEventListener("install", e => {
