@@ -3,7 +3,7 @@
    Este é o único arquivo do site que normalmente precisa ser editado.
    ========================================================= */
 window.CV_CONFIG = {
-  versao: "2.2.0",
+  versao: "2.3.0",
 
   /* URL do App da Web do Apps Script instalado na conta diretcva@gmail.com
      (termina em /exec). Passo a passo: apps-script/GUIA-INSTALACAO.txt

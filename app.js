@@ -541,6 +541,7 @@
     if (!S.token) {
       $("#carregando").hidden = true; $("#login").hidden = false;
       const em = store.get(K_EMAIL); if (em) { $("#email").value = em; $("#senha").focus(); } else $("#email").focus();
+      fetch(CFG.hubUrl).catch(() => {});                 // "acorda" o servidor enquanto o diretor digita
       return;
     }
     mostrarApp();
@@ -561,23 +562,23 @@
     const t0 = Date.now(), email = $("#email").value.trim().toLowerCase(), mant = $("#manter").checked;
     try {
       const j = await api("login", { email, senha: $("#senha").value, manter: mant, dispositivo: nomeDispositivo() });
-      await esperar(1700 - (Date.now() - t0));           // deixa a digital completar a leitura
+      await esperar(650 - (Date.now() - t0));            // tempo mínimo só para a animação não "piscar"
       val.classList.add("ok"); txt.textContent = "Bem-vindo" + (j.nome ? ", " + j.nome.split(" ")[0] : "") + "!";
       store.set(K_MANTER, mant ? "1" : "0"); guardarToken(j.token);
       store.set(K_EMAIL, email); store.set(K_NOME, j.nome || "");
       $("#usuario").textContent = j.nome || "";
       S.prefsLidas = true; aplicarPrefs(j.prefs, false);
-      await esperar(1150);
+      await esperar(560);
       $("#app").hidden = false; aplicar(j.dados);           // o painel se monta por trás
       $("#login").classList.add("saindo");
-      await esperar(450);
+      await esperar(350);
       mostrarApp(); card.classList.remove("ativo"); val.className = "validando"; $("#senha").value = "";
     } catch (x) {
-      await esperar(1100 - (Date.now() - t0));
+      await esperar(600 - (Date.now() - t0));
       val.classList.add("erro");
       const msg = x.message === "Failed to fetch" ? "Sem conexão com o Google. Tente de novo." : x.message;
       txt.textContent = msg;
-      await esperar(1700);
+      await esperar(1300);
       card.classList.remove("ativo");
       await esperar(350);
       val.className = "validando"; $("#login-erro").textContent = msg; $("#senha").select();
