@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Cheiro Verde · Diretoria</title>
+  <meta name="description" content="Painel executivo da Diretoria — Cheiro Verde Ambiental">
+  <meta name="theme-color" content="#0F3D22">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- App no iPad / iPhone -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CV Diretoria">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== Tela de acesso ===== -->
+  <section id="login" class="login" hidden>
+    <div class="login-card">
+      <img src="assets/logo.svg" alt="Cheiro Verde Ambiental" class="login-logo">
+      <h1>Painel da Diretoria</h1>
+      <p>Entre com seu e-mail e senha</p>
+      <form id="login-form">
+        <input id="email" type="email" placeholder="E-mail" aria-label="E-mail" autocomplete="username" autocapitalize="none" required>
+        <input id="senha" type="password" placeholder="Senha" aria-label="Senha" autocomplete="current-password" required>
+        <button type="submit" class="btn btn-primary" id="btn-entrar">Entrar</button>
+      </form>
+      <small id="login-erro" class="login-erro"></small>
+    </div>
+  </section>
+
+  <!-- ===== Aplicativo ===== -->
+  <div id="app" class="app" hidden>
+    <aside class="sidebar">
+      <div class="brand"><img src="assets/logo-branco.svg" alt="Cheiro Verde Ambiental"></div>
+      <nav class="nav" id="nav">
+        <button data-aba="geral" class="ativo"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3zm0 8h8v-6H3zm10 0h8V11h-8zm0-18v6h8V3z"/></svg><span>Visão geral</span></button>
+        <button data-aba="comercial"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg><span>Comercial</span></button>
+        <button data-aba="compras"><svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0 0 20 4H5.21l-.94-2zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg><span>Compras</span><b class="badge" id="badge-compras" hidden></b></button>
+        <button data-aba="logistica"><svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5zM6 18.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm13.5-9 1.96 2.5H17V9.5zM18 18.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg><span>Logística</span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <span><b id="usuario"></b><br><span id="versao"></span></span>
+        <button id="btn-sair" class="link">Sair</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="titulo">
+          <span class="eyebrow">Painel executivo</span>
+          <h1 id="titulo-aba">Visão geral</h1>
+        </div>
+        <div class="filtros">
+          <label class="campo">
+            <span>Período</span>
+            <select id="f-periodo">
+              <option value="mes">Este mês</option>
+              <option value="mesAnt">Mês anterior</option>
+              <option value="tri">Últimos 3 meses</option>
+              <option value="ano">Este ano</option>
+              <option value="12m">Últimos 12 meses</option>
+            </select>
+          </label>
+          <button id="btn-atualizar" class="btn btn-ghost" title="Atualizar agora" aria-label="Atualizar agora">
+            <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg>
+          </button>
+          <button id="btn-imprimir" class="btn btn-ghost" title="Exportar PDF" aria-label="Exportar PDF">
+            <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8zm3-7a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm-1-9H6v4h12z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div id="aviso" class="aviso" hidden></div>
+      <div id="conteudo" class="conteudo"></div>
+
+      <footer class="rodape">
+        <span>Cheiro Verde Ambiental · Uso interno da Diretoria</span>
+        <span id="atualizado"></span>
+      </footer>
+    </main>
+  </div>
+
+  <div id="carregando" class="carregando"><div class="spinner"></div><p>Buscando dados dos sistemas…</p></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
